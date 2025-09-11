@@ -12,6 +12,7 @@ const ButtonPhoneApp = () => {
   const [signalStrength, setSignalStrength] = useState(4);
   const [keyPress, setKeyPress] = useState(null);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [showFullQR, setShowFullQR] = useState(false);
 
   // Memoized language data
   const languageTexts = useMemo(() => ({
@@ -33,7 +34,8 @@ const ButtonPhoneApp = () => {
       yes: 'അതെ', no: 'ഇല്ല',
       goBack: '* തിരികെ പോകാൻ അമർത്തുക',
       completed: 'പൂർത്തിയായി',
-      nextReminder: 'അടുത്ത മരുന്ന്: ഇന്ന് വൈകുന്നേരം 8:00'
+      nextReminder: 'അടുത്ത മരുന്ന്: ഇന്ന് വൈകുന്നേരം 8:00',
+      showQR: 'QR കാണിക്കൂ'
     },
     hi: {
       welcome: 'स्वास्थ्य सहायक में आपका स्वागत है',
@@ -53,7 +55,8 @@ const ButtonPhoneApp = () => {
       yes: 'हाँ', no: 'नहीं',
       goBack: '* वापस जाने के लिए दबाएं',
       completed: 'पूर्ण',
-      nextReminder: 'अगली दवा: आज शाम 8:00 बजे'
+      nextReminder: 'अगली दवा: आज शाम 8:00 बजे',
+      showQR: 'QR दिखाएं'
     },
     bn: {
       welcome: 'স্বাস্থ্য সহায়কে স্বাগতম',
@@ -73,7 +76,8 @@ const ButtonPhoneApp = () => {
       yes: 'হ্যাঁ', no: 'না',
       goBack: '* ফিরে যেতে চাপুন',
       completed: 'সম্পূর্ণ',
-      nextReminder: 'পরবর্তী ওষুধ: আজ সন্ধ্যা ৮টায়'
+      nextReminder: 'পরবর্তী ওষুধ: আজ সন্ধ্যা ৮টায়',
+      showQR: 'QR দেখান'
     },
     ta: {
       welcome: 'ஆரோக்கிய உதவியாளருக்கு வரவேற்கிறோம்',
@@ -93,7 +97,8 @@ const ButtonPhoneApp = () => {
       yes: 'ஆம்', no: 'இல்லை',
       goBack: '* திரும்ப செல்ல அழுத்தவும்',
       completed: 'முடிந்தது',
-      nextReminder: 'அடுத்த மருந்து: இன்று மாலை 8:00'
+      nextReminder: 'அடுத்த மருந்து: இன்று மாலை 8:00',
+      showQR: 'QR காட்டு'
     },
     or: {
       welcome: 'ସ୍ୱାସ୍ଥ୍ୟ ସହାୟକକୁ ସ୍ୱାଗତ',
@@ -113,7 +118,29 @@ const ButtonPhoneApp = () => {
       yes: 'ହଁ', no: 'ନା',
       goBack: '* ପଛକୁ ଯିବାକୁ ଦବାନ୍ତୁ',
       completed: 'ସମ୍ପୂର୍ଣ୍ଣ',
-      nextReminder: 'ପରବର୍ତ୍ତୀ ଔଷଧ: ଆଜି ସନ୍ଧ୍ୟା ୮ଟା'
+      nextReminder: 'ପରବର୍ତ୍ତୀ ଔଷଧ: ଆଜି ସନ୍ଧ୍ୟା ୮ଟା',
+      showQR: 'QR ଦେଖାନ୍ତୁ'
+    },
+    en: {
+      welcome: 'Welcome to Health Assistant',
+      greeting: 'Hello!',
+      homeMenu: {
+        1: { title: 'Medicine & Appointments', subtitle: 'Medicine & Appointments' },
+        2: { title: 'Symptom Report', subtitle: 'Symptom Report' },
+        3: { title: 'Health Education', subtitle: 'Health Education' },
+        4: { title: 'Digital Health Card', subtitle: 'Digital Health Card' }
+      },
+      questions: [
+        { q: 'Do you have fever?', e: 'Do you have fever?' },
+        { q: 'Do you have cough?', e: 'Do you have cough?' },
+        { q: 'Do you have headache?', e: 'Do you have headache?' },
+        { q: 'Do you have body pain?', e: 'Do you have body pain?' }
+      ],
+      yes: 'Yes', no: 'No',
+      goBack: '* Press to go back',
+      completed: 'Completed',
+      nextReminder: 'Next reminder: Today 8:00 PM',
+      showQR: 'Show QR'
     }
   }), []);
 
@@ -123,6 +150,7 @@ const ButtonPhoneApp = () => {
     3: { name: 'বাংলা', english: 'Bengali', flag: '🐅', users: '300M+', code: 'bn' },
     4: { name: 'தமிழ்', english: 'Tamil', flag: '🏛️', users: '78M+', code: 'ta' },
     5: { name: 'ଓଡ଼ିଆ', english: 'Odia', flag: '🦚', users: '42M+', code: 'or' },
+    6: { name: 'English', english: 'English', flag: '🇺🇸', users: '1.5B+', code: 'en' }
   }), []);
 
   const homeMenuBase = useMemo(() => ({
@@ -139,7 +167,8 @@ const ButtonPhoneApp = () => {
         ta: 'மலேரியா தடுப்பு மருந்து',
         ml: 'മലേറിയ പ്രതിരോധ മരുന്ന്',
         bn: 'ম্যালেরিয়া প্রতিরোধী ওষুধ',
-        or: 'ମ୍ୟାଲେରିଆ ପ୍ରତିରୋଧୀ ଔଷଧ'
+        or: 'ମ୍ୟାଲେରିଆ ପ୍ରତିରୋଧୀ ଔଷଧ',
+        en: 'Malaria Prevention Medicine'
       },
       time: '2:00 PM',
       status: 'due',
@@ -148,14 +177,16 @@ const ButtonPhoneApp = () => {
         ta: '1 மாத்திரை',
         ml: '1 ഗുളിക',
         bn: '1 ট্যাবলেট',
-        or: '1 ଟାବଲେଟ'
+        or: '1 ଟାବଲେଟ',
+        en: '1 Tablet'
       },
       remaining: { 
         hi: '12 दिन', 
         ta: '12 நாள்',
         ml: '12 ദിവസം',
         bn: '12 দিন',
-        or: '12 ଦିନ'
+        or: '12 ଦିନ',
+        en: '12 days'
       }
     }
   ], []);
@@ -167,7 +198,8 @@ const ButtonPhoneApp = () => {
         ta: 'சுத்தமான விதிகள்',
         ml: 'ശുചിത്വ നിയമങ്ങൾ',
         bn: 'পরিচ্ছন্নতার নিয়ম',
-        or: 'ପରିଷ୍କାର ନିୟମ'
+        or: 'ପରିଷ୍କାର ନିୟମ',
+        en: 'Hygiene Guidelines'
       },
       subtitle: 'Hygiene Guidelines',
       duration: '4:32',
@@ -180,7 +212,8 @@ const ButtonPhoneApp = () => {
         ta: 'ஊட்டச்சத்து வழிகாட்டி',
         ml: 'പോഷക ഗൈഡ്',
         bn: 'পুষ্টি গাইড',
-        or: 'ପୁଷ୍ଟି ଗାଇଡ୍'
+        or: 'ପୁଷ୍ଟି ଗାଇଡ୍',
+        en: 'Nutrition Guide'
       },
       subtitle: 'Nutrition Guide',
       duration: '6:15',
@@ -193,7 +226,8 @@ const ButtonPhoneApp = () => {
         ta: 'தடுப்பூசி தகவல்',
         ml: 'വാക്സിനേഷൻ വിവരങ്ങൾ',
         bn: 'টিকাদান তথ্য',
-        or: 'ଟିକାକରଣ ସୂଚନା'
+        or: 'ଟିକାକରଣ ସୂଚନା',
+        en: 'Vaccination Information'
       },
       subtitle: 'Vaccination Info',
       duration: '3:48',
@@ -201,6 +235,21 @@ const ButtonPhoneApp = () => {
       category: 'Prevention'
     }
   }), []);
+
+  // GENERATE REAL QR CODE DATA
+  const generateQRData = useCallback(() => {
+    const healthData = {
+      id: 'MW-2025-001234',
+      name: currentLangCode === 'en' ? 'Ram Kumar Sharma' : 'राम कुमार शर्मा',
+      age: 32,
+      bloodGroup: 'B+',
+      emergencyContact: '108',
+      validUntil: '2025-12-31',
+      issuer: 'KERIS Health System',
+      type: 'Digital Health Card'
+    };
+    return `https://keris.health.gov.in/card/${healthData.id}?data=${encodeURIComponent(JSON.stringify(healthData))}`;
+  }, [currentLangCode]);
 
   // Get current language text - memoized
   const getText = useCallback(() => 
@@ -292,12 +341,29 @@ const ButtonPhoneApp = () => {
           }
         }
         break;
+
+      // HANDLE PRESS 1 ON HEALTH CARD SCREEN TO SHOW QR
+      case 'healthcard':
+        if (key === 1) {
+          setShowFullQR(true);
+          setCurrentScreen('qr-fullscreen');
+          speakText(`${texts.showQR} - QR Code displayed in full screen`);
+        }
+        break;
+
+      case 'qr-fullscreen':
+        setShowFullQR(false);
+        setCurrentScreen('healthcard');
+        break;
     }
   }, [currentScreen, languages, homeMenuBase, healthTips, currentLangCode, symptomStep, simulateKeyPress, speakText, getText, languageTexts]);
 
   const goBack = useCallback(() => {
     simulateKeyPress('*');
-    if (currentScreen !== 'language' && currentScreen !== 'boot') {
+    if (currentScreen === 'qr-fullscreen') {
+      setShowFullQR(false);
+      setCurrentScreen('healthcard');
+    } else if (currentScreen !== 'language' && currentScreen !== 'boot') {
       if (currentScreen === 'symptoms') {
         setSymptomStep(0);
         setSymptoms({});
@@ -306,7 +372,7 @@ const ButtonPhoneApp = () => {
     }
   }, [currentScreen, simulateKeyPress]);
 
-  // Render functions for each screen
+  // Render functions
   const renderBootScreen = useCallback(() => (
     <div className="screen boot-screen">
       <div className="boot-logo">
@@ -434,13 +500,13 @@ const ButtonPhoneApp = () => {
               <div className="med-content">
                 <div className="med-name">{med.name[currentLangCode]}</div>
                 <div className="med-dosage">{med.dosage[currentLangCode]}</div>
-                <div className="med-remaining">{med.remaining[currentLangCode]} बचे हैं</div>
+                <div className="med-remaining">{med.remaining[currentLangCode]} {currentLangCode === 'en' ? 'remaining' : 'बचे हैं'}</div>
               </div>
               <div className="med-action">
                 {med.status === 'due' ? (
-                  <div className="take-now">अभी लें</div>
+                  <div className="take-now">{currentLangCode === 'en' ? 'Take Now' : 'अभी लें'}</div>
                 ) : (
-                  <div className="upcoming">आगामी</div>
+                  <div className="upcoming">{currentLangCode === 'en' ? 'Upcoming' : 'आगामी'}</div>
                 )}
               </div>
             </div>
@@ -449,7 +515,7 @@ const ButtonPhoneApp = () => {
 
         <div className="next-reminder">
           <div className="reminder-text">{texts.nextReminder}</div>
-          <div className="reminder-countdown">⏱️ 5 घंटे 23 मिनट में</div>
+          <div className="reminder-countdown">⏱️ {currentLangCode === 'en' ? 'In 5 hours 23 minutes' : '5 घंटे 23 मिनट में'}</div>
         </div>
 
         <div className="navigation-hint">{texts.goBack}</div>
@@ -477,7 +543,7 @@ const ButtonPhoneApp = () => {
             ></div>
           </div>
           <div className="progress-text">
-            प्रश्न {symptomStep + 1} of {texts.questions.length}
+            {currentLangCode === 'en' ? `Question ${symptomStep + 1} of ${texts.questions.length}` : `प्रश्न ${symptomStep + 1} of ${texts.questions.length}`}
           </div>
         </div>
 
@@ -512,7 +578,7 @@ const ButtonPhoneApp = () => {
         <div className="navigation-hint">{texts.goBack}</div>
       </div>
     );
-  }, [getText, symptomStep, handleKeyPress]);
+  }, [getText, symptomStep, handleKeyPress, currentLangCode]);
 
   const renderEducationScreen = useCallback(() => {
     const texts = getText();
@@ -555,6 +621,7 @@ const ButtonPhoneApp = () => {
     );
   }, [getText, healthTips, currentLangCode, handleKeyPress]);
 
+  // UPDATED HEALTH CARD SCREEN - Press 1 to show QR
   const renderHealthCardScreen = useCallback(() => {
     const texts = getText();
     return (
@@ -578,15 +645,12 @@ const ButtonPhoneApp = () => {
 
           <div className="card-body">
             <div className="qr-section">
-              <div className="qr-code">
-                <div className="qr-pattern">
-                  ██ ▄▄ ██<br/>
-                  ▄█ ██ █▄<br/>
-                  ██▄▄▄▄██<br/>
-                  ▄▄▄██▄▄▄<br/>
-                  ██ ▄▄ ██<br/>
-                  ▄█ ██ █▄<br/>
-                  ██▄▄▄▄██
+              <div className="qr-button-display" onClick={() => handleKeyPress(1)}>
+                <div className="qr-button-number">1</div>
+                <div className="qr-button-content">
+                  <div className="qr-icon">📱</div>
+                  <div className="qr-button-text">{texts.showQR}</div>
+                  <div className="qr-press-hint">Press 1</div>
                 </div>
               </div>
               <div className="worker-info">
@@ -596,7 +660,7 @@ const ButtonPhoneApp = () => {
                 </div>
                 <div className="info-row">
                   <div className="label">Name</div>
-                  <div className="value">राम कुमार शर्मा</div>
+                  <div className="value">{currentLangCode === 'en' ? 'Ram Kumar Sharma' : 'राम कुमार शर्मा'}</div>
                 </div>
                 <div className="info-row">
                   <div className="label">Age</div>
@@ -619,7 +683,59 @@ const ButtonPhoneApp = () => {
         <div className="navigation-hint">{texts.goBack}</div>
       </div>
     );
-  }, [getText]);
+  }, [getText, currentLangCode, handleKeyPress]);
+
+  // FULL SCREEN QR CODE WITH REAL QR
+  const renderFullQRScreen = useCallback(() => {
+    const qrData = generateQRData();
+    
+    return (
+      <div className="screen qr-fullscreen-screen">
+        <div className="qr-fullscreen-container">
+          <div className="qr-header">
+            <div className="qr-title">Digital Health QR Code</div>
+            <div className="qr-subtitle">Scan to access health information</div>
+          </div>
+          
+          <div className="qr-code-large">
+            <div className="real-qr-code">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&bgcolor=ffffff&color=000000&margin=10`}
+                alt="Health QR Code"
+                style={{
+                  width: '200px',
+                  height: '200px',
+                  border: '4px solid #000',
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="qr-info">
+            <div className="qr-id">QR ID: MW-2025-001234</div>
+            <div className="qr-worker">{currentLangCode === 'en' ? 'Ram Kumar Sharma' : 'राम कुमार शर्मा'}</div>
+            <div className="qr-validity">Valid until December 2025</div>
+          </div>
+
+          <div className="qr-instructions">
+            <div className="instruction">📱 {currentLangCode === 'en' ? 'Scan with any QR reader' : 'किसी भी QR रीडर से स्कैन करें'}</div>
+            <div className="instruction">🏥 {currentLangCode === 'en' ? 'Access health records instantly' : 'स्वास्थ्य रिकॉर्ड तुरंत एक्सेस करें'}</div>
+            <div className="instruction">🔒 {currentLangCode === 'en' ? 'Secure and encrypted data' : 'सुरक्षित और एन्क्रिप्टेड डेटा'}</div>
+          </div>
+
+          <div className="qr-data-preview">
+            <div className="data-title">QR Data Preview:</div>
+            <div className="data-content">{qrData.length > 80 ? `${qrData.substring(0, 80)}...` : qrData}</div>
+          </div>
+        </div>
+        
+        <div className="navigation-hint">
+          {currentLangCode === 'en' ? 'Press any key to go back' : 'वापस जाने के लिए कोई भी बटन दबाएं'}
+        </div>
+      </div>
+    );
+  }, [currentLangCode, generateQRData]);
 
   const renderReportScreen = useCallback(() => (
     <div className="screen keris-report-screen">
@@ -639,22 +755,6 @@ const ButtonPhoneApp = () => {
             to {
               opacity: 1;
               transform: translateY(0);
-            }
-          }
-          
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          
-          @keyframes slideIn {
-            from {
-              opacity: 0;
-              transform: translateX(-20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
             }
           }
           
@@ -688,108 +788,6 @@ const ButtonPhoneApp = () => {
             font-weight: bold;
             color: #667eea;
           }
-          
-          .report-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            animation: fadeInUp 0.8s ease-out;
-          }
-          
-          .report-subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 30px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-          }
-          
-          .progress-container {
-            width: 100%;
-            max-width: 300px;
-            margin: 20px auto;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-          }
-          
-          .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-          }
-          
-          .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            border-radius: 4px;
-            width: 0%;
-            animation: progressFill 3s ease-out forwards;
-          }
-          
-          @keyframes progressFill {
-            0% { width: 0%; }
-            33% { width: 45%; }
-            66% { width: 78%; }
-            100% { width: 100%; }
-          }
-          
-          .status-list {
-            text-align: left;
-            max-width: 280px;
-            margin: 0 auto;
-          }
-          
-          .status-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            opacity: 0;
-            animation: slideIn 0.5s ease-out forwards;
-          }
-          
-          .status-item:nth-child(1) { animation-delay: 0.8s; }
-          .status-item:nth-child(2) { animation-delay: 1.3s; }
-          .status-item:nth-child(3) { animation-delay: 1.8s; }
-          .status-item:nth-child(4) { animation-delay: 2.3s; }
-          
-          .status-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-          }
-          
-          .status-complete {
-            background: #4CAF50;
-          }
-          
-          .completion-message {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-            opacity: 0;
-            animation: fadeInUp 0.8s ease-out 2.8s both;
-          }
-          
-          .completion-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            animation: pulse 2s infinite;
-          }
-          
-          .keris-footer {
-            margin-top: 30px;
-            opacity: 0.7;
-            font-size: 14px;
-            animation: fadeInUp 0.8s ease-out 3.2s both;
-          }
         `}
       </style>
       
@@ -798,46 +796,7 @@ const ButtonPhoneApp = () => {
       </div>
       
       <div className="report-title">
-        Symptom Analysis Complete
-      </div>
-      
-      <div className="report-subtitle">
-        Reporting to KERIS Health Network
-      </div>
-      
-      <div className="progress-container">
-        <div className="progress-bar">
-          <div className="progress-fill"></div>
-        </div>
-      </div>
-      
-      <div className="status-list">
-        <div className="status-item">
-          <div className="status-icon status-complete">✓</div>
-          <span>Symptoms analyzed and processed</span>
-        </div>
-        <div className="status-item">
-          <div className="status-icon status-complete">✓</div>
-          <span>Health patterns identified</span>
-        </div>
-        <div className="status-item">
-          <div className="status-icon status-complete">✓</div>
-          <span>Report generated successfully</span>
-        </div>
-        <div className="status-item">
-          <div className="status-icon status-complete">✓</div>
-          <span>Data transmitted to KERIS</span>
-        </div>
-      </div>
-      
-      <div className="completion-message">
-        <div className="completion-icon">🏥</div>
-        <div style={{fontSize: '18px', fontWeight: 'bold', marginBottom: '8px'}}>
-          Report Submitted Successfully
-        </div>
-        <div style={{fontSize: '14px', opacity: '0.9'}}>
-          Your symptom data has been securely transmitted to the Kerala Health Information System (KERIS) for analysis and appropriate medical intervention.
-        </div>
+        {currentLangCode === 'en' ? 'Report Submitted Successfully' : 'Report Submitted Successfully'}
       </div>
       
       <div className="keris-footer">
@@ -847,9 +806,9 @@ const ButtonPhoneApp = () => {
         </div>
       </div>
     </div>
-  ), []);
+  ), [currentLangCode]);
 
-  // Main render function with screen routing
+  // Main render function
   const renderScreen = useCallback(() => {
     switch (currentScreen) {
       case 'boot': return renderBootScreen();
@@ -859,9 +818,10 @@ const ButtonPhoneApp = () => {
       case 'symptoms': return renderSymptomsScreen();
       case 'education': return renderEducationScreen();
       case 'healthcard': return renderHealthCardScreen();
+      case 'qr-fullscreen': return renderFullQRScreen();
       default: return renderReportScreen();
     }
-  }, [currentScreen, renderBootScreen, renderLanguageScreen, renderHomeScreen, renderMedicinesScreen, renderSymptomsScreen, renderEducationScreen, renderHealthCardScreen, renderReportScreen]);
+  }, [currentScreen, renderBootScreen, renderLanguageScreen, renderHomeScreen, renderMedicinesScreen, renderSymptomsScreen, renderEducationScreen, renderHealthCardScreen, renderFullQRScreen, renderReportScreen]);
 
   return (
     <>
@@ -1796,20 +1756,168 @@ const ButtonPhoneApp = () => {
           margin-bottom: 24px;
         }
 
-        .qr-code {
+        .qr-button-display {
           flex-shrink: 0;
-          background: #000;
-          color: #000;
-          padding: 12px;
-          border-radius: 8px;
-          border: 2px solid #000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+          border: 2px solid #4338ca;
+          border-radius: 16px;
+          padding: 16px;
+          min-width: 120px;
+          cursor: pointer;
+          transition: all 0.3s ease;
         }
 
-        .qr-pattern {
+        .qr-button-display:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(67, 56, 202, 0.2);
+        }
+
+        .qr-button-number {
+          background: linear-gradient(135deg, #4338ca, #6366f1);
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+        }
+
+        .qr-button-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .qr-icon {
+          font-size: 24px;
+        }
+
+        .qr-button-text {
+          font-size: 12px;
+          font-weight: 600;
+          color: #1f2937;
+          text-align: center;
+        }
+
+        .qr-press-hint {
+          font-size: 10px;
+          color: #6b7280;
+          font-style: italic;
+        }
+
+        .qr-fullscreen-screen {
+          background: linear-gradient(135deg, #1e3a8a, #3730a3);
+          color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 20px;
+        }
+
+        .qr-fullscreen-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+          max-width: 320px;
+        }
+
+        .qr-header {
+          text-align: center;
+        }
+
+        .qr-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 4px;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .qr-subtitle {
+          font-size: 11px;
+          opacity: 0.9;
+        }
+
+        .qr-code-large {
+          background: white;
+          padding: 16px;
+          border-radius: 16px;
+          box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        }
+
+        .real-qr-code img {
+          display: block;
+          max-width: 100%;
+          height: auto;
+        }
+
+        .qr-info {
+          text-align: center;
+        }
+
+        .qr-id {
+          font-size: 12px;
+          font-weight: 600;
+          margin-bottom: 2px;
           font-family: 'Monaco', monospace;
-          font-size: 6px;
-          line-height: 1;
-          white-space: pre;
+        }
+
+        .qr-worker {
+          font-size: 14px;
+          font-weight: 700;
+          margin-bottom: 2px;
+        }
+
+        .qr-validity {
+          font-size: 10px;
+          opacity: 0.8;
+        }
+
+        .qr-instructions {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .instruction {
+          font-size: 9px;
+          opacity: 0.9;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .qr-data-preview {
+          text-align: center;
+          padding: 8px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .data-title {
+          font-size: 10px;
+          font-weight: 600;
+          margin-bottom: 4px;
+          opacity: 0.8;
+        }
+
+        .data-content {
+          font-size: 8px;
+          font-family: 'Monaco', monospace;
+          opacity: 0.7;
+          word-break: break-all;
         }
 
         .worker-info {
@@ -2038,7 +2146,6 @@ const ButtonPhoneApp = () => {
           75% { transform: translateX(2px); }
         }
 
-        /* Enhanced Responsive Design */
         @media (max-width: 1200px) {
           .phone-simulator {
             flex-direction: column;
@@ -2112,41 +2219,34 @@ const ButtonPhoneApp = () => {
         </div>
         
         <div className="demo-panel">
-          <h3 className="demo-title">⚡ OPTIMIZED PROTOTYPE</h3>
+          <h3 className="demo-title">🎯 QR CODE FEATURE</h3>
           <div className="demo-features">
             <div className="feature-item">
-              <div className="feature-icon">⚡</div>
+              <div className="feature-icon">🎯</div>
               <div className="feature-text">
-                <div className="feature-title">Performance Optimized</div>
-                <div className="feature-desc">React.memo, useCallback, useMemo for efficient rendering</div>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🧹</div>
-              <div className="feature-text">
-                <div className="feature-title">Code Structure Refined</div>
-                <div className="feature-desc">Modular components, clean separation of concerns</div>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🌐</div>
-              <div className="feature-text">
-                <div className="feature-title">Multi-Language System</div>
-                <div className="feature-desc">5 regional languages with proper native script rendering</div>
+                <div className="feature-title">Press 1 for QR Code</div>
+                <div className="feature-desc">On health card screen (option 4), press 1 to show QR</div>
               </div>
             </div>
             <div className="feature-item">
               <div className="feature-icon">📱</div>
               <div className="feature-text">
-                <div className="feature-title">Realistic Phone UI</div>
-                <div className="feature-desc">Authentic button phone with haptic feedback & animations</div>
+                <div className="feature-title">Real QR Code Generated</div>
+                <div className="feature-desc">Uses QR server API to generate actual scannable QR codes</div>
               </div>
             </div>
             <div className="feature-item">
-              <div className="feature-icon">🚀</div>
+              <div className="feature-icon">🌐</div>
               <div className="feature-text">
-                <div className="feature-title">Production Ready</div>
-                <div className="feature-desc">Optimized for demos, presentations & competitions</div>
+                <div className="feature-title">6 Language Support</div>
+                <div className="feature-desc">Malayalam, Hindi, Bengali, Tamil, Odia & English</div>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">⚡</div>
+              <div className="feature-text">
+                <div className="feature-title">Optimized Performance</div>
+                <div className="feature-desc">React.memo, useCallback, useMemo for smooth operation</div>
               </div>
             </div>
           </div>
