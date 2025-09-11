@@ -365,8 +365,8 @@ const MobileFraudDetection = () => {
             zIndex: 1001
           }}>
             <div style={{
-              width: '300px',
-              height: '200px',
+              width: '800px',
+              height: '500px',
               border: '2px dashed white',
               borderRadius: '12px',
               position: 'relative'

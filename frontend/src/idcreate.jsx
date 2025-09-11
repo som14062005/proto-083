@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const MigrantHealthRecordApp = () => {
   const [currentStep, setCurrentStep] = useState('welcome');
+  const [showQRModal, setShowQRModal] = useState(false);
   const [formData, setFormData] = useState({
     aadhaar: '',
     name: '',
@@ -89,6 +90,124 @@ const MigrantHealthRecordApp = () => {
       setCurrentStep('success');
       setIsLoading(false);
     }, 3000);
+  };
+
+  // QR Code SVG Component
+  const QRCodeSVG = ({ value, size = 200 }) => {
+    return (
+      <svg width={size} height={size} viewBox="0 0 200 200">
+        {/* QR Code Pattern */}
+        <rect width="200" height="200" fill="white"/>
+        
+        {/* Corner markers */}
+        <rect x="10" y="10" width="60" height="60" fill="black"/>
+        <rect x="20" y="20" width="40" height="40" fill="white"/>
+        <rect x="30" y="30" width="20" height="20" fill="black"/>
+        
+        <rect x="130" y="10" width="60" height="60" fill="black"/>
+        <rect x="140" y="20" width="40" height="40" fill="white"/>
+        <rect x="150" y="30" width="20" height="20" fill="black"/>
+        
+        <rect x="10" y="130" width="60" height="60" fill="black"/>
+        <rect x="20" y="140" width="40" height="40" fill="white"/>
+        <rect x="30" y="150" width="20" height="20" fill="black"/>
+        
+        {/* Timing patterns */}
+        <rect x="80" y="15" width="10" height="10" fill="black"/>
+        <rect x="100" y="15" width="10" height="10" fill="black"/>
+        <rect x="120" y="15" width="10" height="10" fill="black"/>
+        
+        <rect x="15" y="80" width="10" height="10" fill="black"/>
+        <rect x="15" y="100" width="10" height="10" fill="black"/>
+        <rect x="15" y="120" width="10" height="10" fill="black"/>
+        
+        {/* Data pattern (simplified) */}
+        <rect x="80" y="40" width="10" height="10" fill="black"/>
+        <rect x="100" y="40" width="10" height="10" fill="black"/>
+        <rect x="80" y="50" width="10" height="10" fill="black"/>
+        <rect x="110" y="50" width="10" height="10" fill="black"/>
+        
+        <rect x="40" y="80" width="10" height="10" fill="black"/>
+        <rect x="50" y="80" width="10" height="10" fill="black"/>
+        <rect x="60" y="80" width="10" height="10" fill="black"/>
+        <rect x="40" y="90" width="10" height="10" fill="black"/>
+        <rect x="60" y="90" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="80" width="10" height="10" fill="black"/>
+        <rect x="100" y="80" width="10" height="10" fill="black"/>
+        <rect x="120" y="80" width="10" height="10" fill="black"/>
+        <rect x="140" y="80" width="10" height="10" fill="black"/>
+        <rect x="160" y="80" width="10" height="10" fill="black"/>
+        <rect x="180" y="80" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="100" width="10" height="10" fill="black"/>
+        <rect x="90" y="100" width="10" height="10" fill="black"/>
+        <rect x="110" y="100" width="10" height="10" fill="black"/>
+        <rect x="130" y="100" width="10" height="10" fill="black"/>
+        <rect x="150" y="100" width="10" height="10" fill="black"/>
+        <rect x="170" y="100" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="120" width="10" height="10" fill="black"/>
+        <rect x="100" y="120" width="10" height="10" fill="black"/>
+        <rect x="120" y="120" width="10" height="10" fill="black"/>
+        <rect x="140" y="120" width="10" height="10" fill="black"/>
+        <rect x="160" y="120" width="10" height="10" fill="black"/>
+        <rect x="180" y="120" width="10" height="10" fill="black"/>
+        
+        <rect x="40" y="140" width="10" height="10" fill="black"/>
+        <rect x="60" y="140" width="10" height="10" fill="black"/>
+        <rect x="40" y="160" width="10" height="10" fill="black"/>
+        <rect x="50" y="160" width="10" height="10" fill="black"/>
+        <rect x="60" y="160" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="140" width="10" height="10" fill="black"/>
+        <rect x="90" y="140" width="10" height="10" fill="black"/>
+        <rect x="110" y="140" width="10" height="10" fill="black"/>
+        <rect x="130" y="140" width="10" height="10" fill="black"/>
+        <rect x="150" y="140" width="10" height="10" fill="black"/>
+        <rect x="170" y="140" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="160" width="10" height="10" fill="black"/>
+        <rect x="100" y="160" width="10" height="10" fill="black"/>
+        <rect x="120" y="160" width="10" height="10" fill="black"/>
+        <rect x="140" y="160" width="10" height="10" fill="black"/>
+        <rect x="160" y="160" width="10" height="10" fill="black"/>
+        <rect x="180" y="160" width="10" height="10" fill="black"/>
+        
+        <rect x="80" y="180" width="10" height="10" fill="black"/>
+        <rect x="90" y="180" width="10" height="10" fill="black"/>
+        <rect x="110" y="180" width="10" height="10" fill="black"/>
+        <rect x="130" y="180" width="10" height="10" fill="black"/>
+        <rect x="150" y="180" width="10" height="10" fill="black"/>
+        <rect x="170" y="180" width="10" height="10" fill="black"/>
+      </svg>
+    );
+  };
+
+  // QR Modal Component
+  const QRModal = ({ isOpen, onClose, healthId }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="qr-modal-overlay" onClick={onClose}>
+        <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="qr-modal-header">
+            <h3>स्वास्थ्य कार्ड QR कोड<br/>Health Card QR Code</h3>
+            <button className="qr-modal-close" onClick={onClose}>×</button>
+          </div>
+          <div className="qr-modal-body">
+            <div className="qr-fullscreen">
+              <QRCodeSVG value={`https://kerala.gov.in/health/migrant/${healthId}`} size={300} />
+            </div>
+            <div className="qr-modal-info">
+              <p><strong>Health ID:</strong> {healthId}</p>
+              <p>चिकित्सा सेवा के लिए इस QR कोड को स्कैन करें<br/>
+                 Scan this QR code for medical services</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const renderWelcome = () => (
@@ -483,18 +602,12 @@ const MigrantHealthRecordApp = () => {
 
             <div className="qr-section">
               <div className="qr-code-large">
-                <div className="qr-pattern">
-                  ████████████<br/>
-                  █ ▄▄▄▄▄ █ ▄█<br/>
-                  █ █▄▄▄█ █ ██<br/>
-                  █▄▄▄▄▄▄▄█ ▀█<br/>
-                  ▄ ▄▄▄ ▄ ▄▄██<br/>
-                  ██▄█▄▀▄▀▄ ▄█<br/>
-                  ▄▄▄▄▄▄▄█▄▄██<br/>
-                  ████████████
-                </div>
+                <QRCodeSVG value={qrCode} size={150} />
               </div>
-              <div className="qr-instruction">
+              <div 
+                className="qr-instruction clickable"
+                onClick={() => setShowQRModal(true)}
+              >
                 चिकित्सा सेवा के लिए QR स्कैन करें<br/>
                 Scan QR for Medical Services
               </div>
@@ -534,6 +647,13 @@ const MigrantHealthRecordApp = () => {
           </button>
         </div>
       </div>
+
+      {/* QR Modal */}
+      <QRModal 
+        isOpen={showQRModal} 
+        onClose={() => setShowQRModal(false)}
+        healthId={healthId}
+      />
     </div>
   );
 
@@ -1074,18 +1194,22 @@ const MigrantHealthRecordApp = () => {
           display: inline-block;
         }
 
-        .qr-pattern {
-          font-family: 'Monaco', monospace;
-          font-size: 10px;
-          line-height: 1;
-          color: #333;
-        }
-
         .qr-instruction {
           font-size: 12px;
           color: #666;
           font-weight: 500;
           line-height: 1.3;
+        }
+
+        .qr-instruction.clickable {
+          cursor: pointer;
+          color: #1976d2;
+          text-decoration: underline;
+          transition: color 0.3s ease;
+        }
+
+        .qr-instruction.clickable:hover {
+          color: #0d47a1;
         }
 
         .card-footer {
@@ -1160,6 +1284,123 @@ const MigrantHealthRecordApp = () => {
           margin-top: 24px;
         }
 
+        /* QR Modal Styles */
+        .qr-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          backdrop-filter: blur(5px);
+        }
+
+        .qr-modal-content {
+          background: white;
+          border-radius: 16px;
+          max-width: 450px;
+          width: 90%;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .qr-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 24px;
+          border-bottom: 2px solid #e0e0e0;
+          background: linear-gradient(135deg, #1565c0, #0d47a1);
+          color: white;
+          border-radius: 16px 16px 0 0;
+        }
+
+        .qr-modal-header h3 {
+          font-size: 18px;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+
+        .qr-modal-close {
+          background: none;
+          border: none;
+          font-size: 32px;
+          color: white;
+          cursor: pointer;
+          padding: 0;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background-color 0.3s ease;
+        }
+
+        .qr-modal-close:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .qr-modal-body {
+          padding: 32px 24px;
+          text-align: center;
+        }
+
+        .qr-fullscreen {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 24px;
+          padding: 20px;
+          background: #f8f9fa;
+          border-radius: 12px;
+          border: 3px solid #1976d2;
+        }
+
+        .qr-modal-info {
+          background: #e3f2fd;
+          padding: 20px;
+          border-radius: 12px;
+          border-left: 4px solid #1976d2;
+        }
+
+        .qr-modal-info p {
+          font-size: 14px;
+          line-height: 1.5;
+          margin-bottom: 8px;
+          color: #1565c0;
+        }
+
+        .qr-modal-info p:last-child {
+          margin-bottom: 0;
+          font-weight: 500;
+        }
+
+        .qr-modal-info strong {
+          font-family: 'Monaco', monospace;
+          background: white;
+          padding: 2px 6px;
+          border-radius: 4px;
+          color: #0d47a1;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
           .step-container {
@@ -1195,6 +1436,15 @@ const MigrantHealthRecordApp = () => {
           .header-section h2 {
             font-size: 20px;
           }
+
+          .qr-modal-content {
+            width: 95%;
+            margin: 20px;
+          }
+
+          .qr-fullscreen {
+            padding: 15px;
+          }
         }
 
         /* Print Styles */
@@ -1209,6 +1459,10 @@ const MigrantHealthRecordApp = () => {
           }
 
           .primary-btn, .secondary-btn {
+            display: none;
+          }
+
+          .qr-modal-overlay {
             display: none;
           }
         }

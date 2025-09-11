@@ -14,6 +14,7 @@ L.Icon.Default.mergeOptions({
 const iPhoneHealthCampsApp = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedCamp, setSelectedCamp] = useState(null);
+  const [registeredCamp, setRegisteredCamp] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -108,9 +109,16 @@ const iPhoneHealthCampsApp = () => {
   const handleRegister = (campId) => {
     setIsLoading(true);
     setTimeout(() => {
+      const camp = camps.find(c => c.id === campId);
+      setRegisteredCamp(camp);
       setIsLoading(false);
       setShowConfirmation(true);
-      setTimeout(() => setShowConfirmation(false), 3000);
+      
+      // Automatically show directions after 2 seconds
+      setTimeout(() => {
+        setShowConfirmation(false);
+        openGoogleMapsDirections(camp.coordinates);
+      }, 2000);
     }, 1500);
   };
 
@@ -157,6 +165,14 @@ const iPhoneHealthCampsApp = () => {
     }, [camps, userLocation, map]);
 
     return null;
+  };
+
+  // Google Maps directions function
+  const openGoogleMapsDirections = (destination) => {
+    const origin = `${userLocation[0]},${userLocation[1]}`;
+    const dest = `${destination[0]},${destination[1]}`;
+    const url = `https://www.google.com/maps/dir/${origin}/${dest}`;
+    window.open(url, '_blank');
   };
 
   return (
@@ -336,7 +352,7 @@ const iPhoneHealthCampsApp = () => {
         }
 
         .map-container {
-          height: 300px;
+          height: 350px;
           margin: 0 16px 16px;
           border-radius: 16px;
           overflow: hidden;
@@ -358,6 +374,11 @@ const iPhoneHealthCampsApp = () => {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
+        }
+
+        .camp-card.registered {
+          border-color: #10b981;
+          box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
         }
 
         .camp-card::before {
@@ -434,6 +455,11 @@ const iPhoneHealthCampsApp = () => {
         .badge.free {
           background: #dcfce7;
           color: #166534;
+        }
+
+        .badge.registered {
+          background: #d1fae5;
+          color: #065f46;
         }
 
         @keyframes badgePulse {
@@ -523,6 +549,7 @@ const iPhoneHealthCampsApp = () => {
           align-items: center;
           justify-content: center;
           gap: 8px;
+          margin-bottom: 8px;
         }
 
         .register-btn:active {
@@ -532,6 +559,31 @@ const iPhoneHealthCampsApp = () => {
         .register-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+
+        .register-btn.registered {
+          background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .directions-btn {
+          background: linear-gradient(135deg, #3b82f6, #2563eb);
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 600;
+          width: 100%;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .directions-btn:hover {
+          background: linear-gradient(135deg, #2563eb, #1d4ed8);
         }
 
         .loading-spinner {
@@ -583,6 +635,13 @@ const iPhoneHealthCampsApp = () => {
           font-size: 13px;
           color: #6b7280;
           line-height: 1.4;
+        }
+
+        .countdown-text {
+          font-size: 11px;
+          color: #3b82f6;
+          margin-top: 8px;
+          font-weight: 600;
         }
 
         .home-indicator {
@@ -733,11 +792,17 @@ const iPhoneHealthCampsApp = () => {
                     <Marker 
                       key={camp.id}
                       position={camp.coordinates}
-                      icon={createCustomIcon(camp.color, camp.icon)}
+                      icon={createCustomIcon(
+                        registeredCamp?.id === camp.id ? '#10b981' : camp.color, 
+                        camp.icon
+                      )}
                     >
                       <Popup>
                         <div>
-                          <div className="popup-camp-name">{camp.name}</div>
+                          <div className="popup-camp-name">
+                            {camp.name}
+                            {registeredCamp?.id === camp.id && ' ✅'}
+                          </div>
                           <div className="popup-camp-info">
                             📍 {camp.location}<br/>
                             📅 {camp.date} | 🕐 {camp.time}<br/>
@@ -745,7 +810,26 @@ const iPhoneHealthCampsApp = () => {
                           </div>
                           <div className="popup-availability">
                             👥 {camp.available} spots available
+                            {registeredCamp?.id === camp.id && <br/>}
+                            {registeredCamp?.id === camp.id && '✅ Registered!'}
                           </div>
+                          {registeredCamp?.id === camp.id && (
+                            <button 
+                              onClick={() => openGoogleMapsDirections(camp.coordinates)}
+                              style={{
+                                background: '#3b82f6',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '10px',
+                                marginTop: '8px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              🧭 Get Directions
+                            </button>
+                          )}
                         </div>
                       </Popup>
                     </Marker>
@@ -759,7 +843,7 @@ const iPhoneHealthCampsApp = () => {
                 {camps.map(camp => (
                   <div 
                     key={camp.id} 
-                    className="camp-card"
+                    className={`camp-card ${registeredCamp?.id === camp.id ? 'registered' : ''}`}
                     style={{ '--camp-color': camp.color, '--availability-color': getAvailabilityColor(camp.available, camp.total) }}
                   >
                     <div className="camp-header">
@@ -772,6 +856,7 @@ const iPhoneHealthCampsApp = () => {
                           <span className="badge free">निःशुल्क</span>
                           {camp.isWHO && <span className="badge who">WHO</span>}
                           {camp.urgent && <span className="badge urgent">तत्काल</span>}
+                          {registeredCamp?.id === camp.id && <span className="badge registered">पंजीकृत</span>}
                         </div>
                       </div>
                     </div>
@@ -797,20 +882,34 @@ const iPhoneHealthCampsApp = () => {
                       </div>
                     </div>
 
-                    <button 
-                      className="register-btn"
-                      onClick={() => handleRegister(camp.id)}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <div className="loading-spinner"></div>
-                          पंजीकरण हो रहा है...
-                        </>
-                      ) : (
-                        <>✅ तुरंत पंजीकरण करें / Register Now</>
-                      )}
-                    </button>
+                    {registeredCamp?.id === camp.id ? (
+                      <>
+                        <button className="register-btn registered" disabled>
+                          ✅ पंजीकृत / Registered
+                        </button>
+                        <button 
+                          className="directions-btn"
+                          onClick={() => openGoogleMapsDirections(camp.coordinates)}
+                        >
+                          🧭 दिशाएं देखें / Get Directions
+                        </button>
+                      </>
+                    ) : (
+                      <button 
+                        className="register-btn"
+                        onClick={() => handleRegister(camp.id)}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="loading-spinner"></div>
+                            पंजीकरण हो रहा है...
+                          </>
+                        ) : (
+                          <>✅ तुरंत पंजीकरण करें / Register Now</>
+                        )}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -825,6 +924,9 @@ const iPhoneHealthCampsApp = () => {
                 आपका पंजीकरण पूरा हो गया है।<br/>
                 SMS द्वारा पुष्टि मिलेगी।<br/>
                 <strong>Successfully Registered!</strong>
+              </div>
+              <div className="countdown-text">
+                🧭 Opening directions in 2 seconds...
               </div>
             </div>
           )}
