@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useNavigate } from 'react-router-dom';
 
 const KeralaHealthSurveillanceApp = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -11,6 +12,12 @@ const KeralaHealthSurveillanceApp = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const navigate = useNavigate();
+
+  // Navigate to home function
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   // Enhanced disease outbreak data with priority levels
   const diseaseData = [
@@ -186,6 +193,52 @@ const KeralaHealthSurveillanceApp = () => {
     ? diseaseData 
     : diseaseData.filter(item => item.disease === selectedDisease);
 
+  // Home Button Component
+  const HomeButton = () => (
+    <button 
+      onClick={handleHomeClick}
+      title="वापस मुख्य पृष्ठ पर जाएं / Return to Home"
+      style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        width: '50px',
+        height: '50px',
+        backgroundColor: '#1976d2',
+        border: 'none',
+        borderRadius: '50%',
+        color: 'white',
+        fontSize: '24px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 16px rgba(25, 118, 210, 0.3)',
+        transition: 'all 0.3s ease',
+        zIndex: 100,
+        background: 'linear-gradient(135deg, #1976d2, #1565c0)'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.transform = 'translateY(-2px) scale(1.05)';
+        e.target.style.boxShadow = '0 6px 20px rgba(25, 118, 210, 0.4)';
+        e.target.style.background = 'linear-gradient(135deg, #1565c0, #0d47a1)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.transform = 'translateY(0) scale(1)';
+        e.target.style.boxShadow = '0 4px 16px rgba(25, 118, 210, 0.3)';
+        e.target.style.background = 'linear-gradient(135deg, #1976d2, #1565c0)';
+      }}
+      onMouseDown={(e) => {
+        e.target.style.transform = 'translateY(0) scale(0.98)';
+      }}
+      onMouseUp={(e) => {
+        e.target.style.transform = 'translateY(-2px) scale(1.05)';
+      }}
+    >
+      🏠
+    </button>
+  );
+
   const CampaignModal = () => {
     const [campaignType, setCampaignType] = useState('vaccination');
     const [duration, setDuration] = useState('3');
@@ -285,6 +338,7 @@ const KeralaHealthSurveillanceApp = () => {
           box-shadow: 
             0 30px 80px rgba(0,0,0,0.4),
             inset 0 2px 0 rgba(255,255,255,0.1);
+          position: relative;
         }
 
         .phone-screen {
@@ -318,6 +372,8 @@ const KeralaHealthSurveillanceApp = () => {
           color: white;
           font-size: 14px;
           font-weight: 600;
+          position: relative;
+          z-index: 10;
         }
 
         .app-content {
@@ -325,6 +381,8 @@ const KeralaHealthSurveillanceApp = () => {
           background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
+          position: relative;
+          z-index: 1;
         }
 
         .app-header {
@@ -333,7 +391,7 @@ const KeralaHealthSurveillanceApp = () => {
           color: white;
           position: sticky;
           top: 0;
-          z-index: 5;
+          z-index: 20;
         }
 
         .app-title {
@@ -379,6 +437,8 @@ const KeralaHealthSurveillanceApp = () => {
           padding: 12px;
           border-radius: 12px;
           animation: slideIn 0.5s ease;
+          position: relative;
+          z-index: 15;
         }
 
         @keyframes slideIn {
@@ -398,6 +458,8 @@ const KeralaHealthSurveillanceApp = () => {
           margin: 0 16px 16px;
           border-radius: 16px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          position: relative;
+          z-index: 15;
         }
 
         .disease-filters {
@@ -455,6 +517,8 @@ const KeralaHealthSurveillanceApp = () => {
           grid-template-columns: repeat(2, 1fr);
           gap: 12px;
           margin: 0 16px 16px;
+          position: relative;
+          z-index: 15;
         }
 
         .stat-card {
@@ -491,6 +555,7 @@ const KeralaHealthSurveillanceApp = () => {
           letter-spacing: 0.5px;
         }
 
+        /* FIXED MAP CONTAINER STYLES */
         .map-container {
           height: 250px;
           margin: 0 16px 16px;
@@ -498,15 +563,37 @@ const KeralaHealthSurveillanceApp = () => {
           overflow: hidden;
           box-shadow: 0 4px 20px rgba(0,0,0,0.1);
           position: relative;
+          z-index: 1; /* Lower z-index to prevent overlapping */
         }
 
+        /* Fix Leaflet container sizing and z-index issues */
         .leaflet-container {
-          height: 100%;
-          width: 100%;
+          height: 100% !important;
+          width: 100% !important;
+          z-index: 1 !important; /* Ensure map stays below other content */
+          position: relative;
+        }
+
+        /* Ensure leaflet controls don't overlap other content */
+        .leaflet-control-container {
+          position: absolute;
+          z-index: 5 !important;
+        }
+
+        /* Fix popup z-index to appear above map but below modal */
+        .leaflet-popup-pane {
+          z-index: 10 !important;
+        }
+
+        .leaflet-popup-content-wrapper {
+          border-radius: 12px !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
         }
 
         .alerts-section {
           padding: 0 16px 100px;
+          position: relative;
+          z-index: 15;
         }
 
         .alert-card {
@@ -518,6 +605,8 @@ const KeralaHealthSurveillanceApp = () => {
           border-left: 4px solid var(--severity-color, #059669);
           cursor: pointer;
           transition: all 0.3s ease;
+          position: relative;
+          z-index: 15;
         }
 
         .alert-card:active {
@@ -602,6 +691,8 @@ const KeralaHealthSurveillanceApp = () => {
 
         .campaigns-list {
           padding: 0 16px 100px;
+          position: relative;
+          z-index: 15;
         }
 
         .campaign-card {
@@ -611,6 +702,8 @@ const KeralaHealthSurveillanceApp = () => {
           padding: 16px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.1);
           border-left: 4px solid var(--campaign-color, #059669);
+          position: relative;
+          z-index: 15;
         }
 
         .campaign-header {
@@ -652,7 +745,7 @@ const KeralaHealthSurveillanceApp = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 100;
+          z-index: 1000; /* Highest z-index for modal */
           padding: 20px;
         }
 
@@ -664,6 +757,8 @@ const KeralaHealthSurveillanceApp = () => {
           max-width: 320px;
           max-height: 80vh;
           overflow-y: auto;
+          position: relative;
+          z-index: 1001;
         }
 
         .modal-header {
@@ -781,11 +876,7 @@ const KeralaHealthSurveillanceApp = () => {
           height: 5px;
           background: rgba(255,255,255,0.3);
           border-radius: 2.5px;
-        }
-
-        .leaflet-popup-content-wrapper {
-          border-radius: 12px;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+          z-index: 20;
         }
 
         .popup-content {
@@ -816,9 +907,25 @@ const KeralaHealthSurveillanceApp = () => {
           font-weight: 600;
           cursor: pointer;
         }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+          .phone-container {
+            margin: 10px;
+          }
+        }
+
+        /* Print styles */
+        @media print {
+          .phone-container {
+            box-shadow: none;
+            border: 2px solid #333;
+          }
+        }
       `}</style>
 
       <div className="phone-container">
+        <HomeButton />
         <div className="phone-screen">
           <div className="notch"></div>
           
@@ -924,6 +1031,7 @@ const KeralaHealthSurveillanceApp = () => {
                     zoom={7} 
                     style={{ height: '100%', width: '100%' }}
                     zoomControl={false}
+                    attributionControl={false}
                   >
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

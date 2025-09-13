@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useNavigate } from 'react-router-dom';
 
 // Fix for default markers in Leaflet with React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,6 +20,12 @@ const iPhoneHealthCampsApp = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [userLocation, setUserLocation] = useState([10.1632, 76.6413]); // Ernakulam, Kerala
+  const navigate = useNavigate();
+
+  // Navigate to home function
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   const camps = [
     {
@@ -175,6 +182,17 @@ const iPhoneHealthCampsApp = () => {
     window.open(url, '_blank');
   };
 
+  // Home Button Component
+  const HomeButton = () => (
+    <button 
+      className="home-button" 
+      onClick={handleHomeClick}
+      title="वापस मुख्य पृष्ठ पर जाएं / Return to Home"
+    >
+      🏠
+    </button>
+  );
+
   return (
     <>
       <style>{`
@@ -257,6 +275,38 @@ const iPhoneHealthCampsApp = () => {
           background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
+          position: relative;
+        }
+
+        /* HOME BUTTON STYLES */
+        .home-button {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #1976d2, #1565c0);
+          border: none;
+          border-radius: 50%;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 16px rgba(25, 118, 210, 0.3);
+          transition: all 0.3s ease;
+          z-index: 1000;
+        }
+
+        .home-button:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+          background: linear-gradient(135deg, #1565c0, #0d47a1);
+        }
+
+        .home-button:active {
+          transform: translateY(0) scale(0.98);
         }
 
         .app-header {
@@ -696,6 +746,24 @@ const iPhoneHealthCampsApp = () => {
           font-size: 11px;
           color: #374151;
         }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+          .home-button {
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+          }
+        }
+
+        /* Print styles */
+        @media print {
+          .home-button {
+            display: none;
+          }
+        }
       `}</style>
 
       <div className="iphone-container">
@@ -715,6 +783,7 @@ const iPhoneHealthCampsApp = () => {
           </div>
 
           <div className="app-content">
+            <HomeButton />
             <div className="app-header">
               <div className="app-title">निकटतम स्वास्थ्य शिविर</div>
               <div className="app-subtitle">Nearby Health Camps</div>

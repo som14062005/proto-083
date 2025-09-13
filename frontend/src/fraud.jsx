@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AlertTriangle, Shield, CheckCircle, XCircle, Camera, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MobileFraudDetection = () => {
   const [medicineData, setMedicineData] = useState({
@@ -18,11 +19,17 @@ const MobileFraudDetection = () => {
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [cameraError, setCameraError] = useState('');
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const navigate = useNavigate();
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Navigate to home function
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   const mockPermanentLogs = [
     { id: 1, medicine: 'Paracetamol 500mg', batch: 'PAR2024001', manufacturer: 'SUN001', status: 'verified', timestamp: '2024-09-10T10:30:00Z' },
@@ -266,6 +273,52 @@ const MobileFraudDetection = () => {
     }
   };
 
+  // Home Button Component
+  const HomeButton = () => (
+    <button 
+      onClick={handleHomeClick}
+      title="वापस मुख्य पृष्ठ पर जाएं / Return to Home"
+      style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        width: '50px',
+        height: '50px',
+        backgroundColor: '#1976d2',
+        border: 'none',
+        borderRadius: '50%',
+        color: 'white',
+        fontSize: '24px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 16px rgba(25, 118, 210, 0.3)',
+        transition: 'all 0.3s ease',
+        zIndex: 1000,
+        background: 'linear-gradient(135deg, #1976d2, #1565c0)'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.transform = 'translateY(-2px) scale(1.05)';
+        e.target.style.boxShadow = '0 6px 20px rgba(25, 118, 210, 0.4)';
+        e.target.style.background = 'linear-gradient(135deg, #1565c0, #0d47a1)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.transform = 'translateY(0) scale(1)';
+        e.target.style.boxShadow = '0 4px 16px rgba(25, 118, 210, 0.3)';
+        e.target.style.background = 'linear-gradient(135deg, #1976d2, #1565c0)';
+      }}
+      onMouseDown={(e) => {
+        e.target.style.transform = 'translateY(0) scale(0.98)';
+      }}
+      onMouseUp={(e) => {
+        e.target.style.transform = 'translateY(-2px) scale(1.05)';
+      }}
+    >
+      🏠
+    </button>
+  );
+
   // Camera View - FIXED VIDEO ZOOM ISSUE
   if (isCameraOpen) {
     return (
@@ -278,6 +331,7 @@ const MobileFraudDetection = () => {
         backgroundColor: 'black',
         zIndex: 1000
       }}>
+        <HomeButton />
         {/* Header */}
         <div style={{
           position: 'absolute',
@@ -448,6 +502,7 @@ const MobileFraudDetection = () => {
   // Main App View
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
+      <HomeButton />
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 sticky top-0 z-40 shadow-lg">
         <div className="flex items-center">

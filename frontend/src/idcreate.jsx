@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MigrantHealthRecordApp = () => {
   const [currentStep, setCurrentStep] = useState('welcome');
   const [showQRModal, setShowQRModal] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     aadhaar: '',
     name: '',
@@ -22,6 +24,11 @@ const MigrantHealthRecordApp = () => {
   const [healthId, setHealthId] = useState('');
   const [qrCode, setQrCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Navigate to home function
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   // Generate unique health ID
   const generateHealthId = () => {
@@ -210,8 +217,20 @@ const MigrantHealthRecordApp = () => {
     );
   };
 
+  // Home Button Component
+  const HomeButton = () => (
+    <button 
+      className="home-button" 
+      onClick={handleHomeClick}
+      title="वापस मुख्य पृष्ठ पर जाएं / Return to Home"
+    >
+      🏠
+    </button>
+  );
+
   const renderWelcome = () => (
     <div className="step-container">
+      <HomeButton />
       <div className="header-section">
         <div className="kerala-emblem">🏛️</div>
         <h1>केरल सरकार</h1>
@@ -290,6 +309,7 @@ const MigrantHealthRecordApp = () => {
 
   const renderAadhaar = () => (
     <div className="step-container">
+      <HomeButton />
       <div className="step-header">
         <div className="step-progress">
           <div className="progress-bar">
@@ -393,6 +413,7 @@ const MigrantHealthRecordApp = () => {
 
   const renderProfile = () => (
     <div className="step-container">
+      <HomeButton />
       <div className="step-header">
         <div className="step-progress">
           <div className="progress-bar">
@@ -565,6 +586,7 @@ const MigrantHealthRecordApp = () => {
 
   const renderSuccess = () => (
     <div className="step-container">
+      <HomeButton />
       <div className="success-container">
         <div className="success-header">
           <div className="success-icon-large">🎉</div>
@@ -702,6 +724,37 @@ const MigrantHealthRecordApp = () => {
           right: 0;
           height: 4px;
           background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700, #4caf50, #2196f3, #9c27b0);
+        }
+
+        /* HOME BUTTON STYLES */
+        .home-button {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #1976d2, #1565c0);
+          border: none;
+          border-radius: 50%;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 16px rgba(25, 118, 210, 0.3);
+          transition: all 0.3s ease;
+          z-index: 1000;
+        }
+
+        .home-button:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+          background: linear-gradient(135deg, #1565c0, #0d47a1);
+        }
+
+        .home-button:active {
+          transform: translateY(0) scale(0.98);
         }
 
         .header-section {
@@ -1401,11 +1454,19 @@ const MigrantHealthRecordApp = () => {
           color: #0d47a1;
         }
 
-        /* Responsive Design */
+        /* Mobile responsive */
         @media (max-width: 768px) {
           .step-container {
             padding: 20px;
             margin: 10px;
+          }
+
+          .home-button {
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
           }
 
           .benefits-grid {
@@ -1447,7 +1508,7 @@ const MigrantHealthRecordApp = () => {
           }
         }
 
-        /* Print Styles */
+        /* Print styles */
         @media print {
           body {
             background: white;
@@ -1458,7 +1519,7 @@ const MigrantHealthRecordApp = () => {
             border: 2px solid #333;
           }
 
-          .primary-btn, .secondary-btn {
+          .primary-btn, .secondary-btn, .home-button {
             display: none;
           }
 
